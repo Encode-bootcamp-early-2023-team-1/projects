@@ -4,7 +4,7 @@ import { Ballot__factory } from "../typechain-types";
 dotenv.config();
 
 // Run script as follow:
-// yarn run ts-node --files scripts/Deployment.ts "arg1" "arg2" "arg3"
+// yarn run ts-node --files scripts/01_Deployment.ts "arg1" "arg2" "arg3"
 
 function convertStringArrayToBytes32(array: string[]) {
     const bytes32Array = [];
@@ -16,27 +16,27 @@ function convertStringArrayToBytes32(array: string[]) {
 
 async function main() {
     const args = process.argv;
-    
+
     const PROPOSALS = args.slice(2);
 
     if (PROPOSALS.length <= 0) {
         throw new Error("Missing parameter : proposals");
     }
-    
-    const pkey=  process.env.PRIVATE_KEY;
 
-    if ( !pkey || pkey.length <= 0) {
+    const pkey = process.env.PRIVATE_KEY;
+
+    if (!pkey || pkey.length <= 0) {
         throw new Error("Missing environment : mnemonic seed");
     }
 
-    //Get a provider
-    const provider = ethers.getDefaultProvider("goerli");
+    // Get a provider
+    const provider = ethers.provider;
 
     //Get your signer from .env ( chairperson)
     const wallet = new ethers.Wallet(pkey);
-    const signer1= wallet.connect(provider);
+    const signer1 = wallet.connect(provider);
 
-    //create a contract instance (attach)
+    // create a contract instance (attach)
     const ballotContractFactory = new Ballot__factory(signer1);
     const ballotContract = await ballotContractFactory.deploy(
         convertStringArrayToBytes32(PROPOSALS)
