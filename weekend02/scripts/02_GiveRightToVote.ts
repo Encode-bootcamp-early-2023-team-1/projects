@@ -3,17 +3,24 @@ import * as dotenv from 'dotenv';
 import { Ballot__factory } from "../typechain-types";
 dotenv.config();
 
-// yarn run ts-node --files scripts/02_GiveRightToVote.ts "0x0000..." "0x0000..." "0x0000..."
+// yarn run ts-node --files scripts/02_GiveRightToVote.ts <BALLOT_ADDRESS> "voterAddress1" "voterAddress2" "voterAddressN"
 
 async function main() {
     const args = process.argv;
 
-    const voters = args.slice(2);
+    // TODO: do proper check before using it
+    const ballotAddress = args.slice(2, 3)[0];
+    const voters = args.slice(3);
 
-    if (voters.length <= 0) {
-        throw new Error("Missing parameter : voters");
+    if (!ballotAddress || ballotAddress.length <= 0) {
+        throw new Error("Missing parameter: ballot address");
     }
 
+    if (voters.length <= 0) {
+        throw new Error("Missing parameter: voters");
+    }
+
+    // get default provider from hardhat config
     const provider = ethers.provider;
     const pkey = process.env.PRIVATE_KEY;
 
@@ -25,17 +32,13 @@ async function main() {
     // Get your signer from .env (should be chairperson)
     const signer1 = wallet.connect(provider);
 
-    const ballotAddress = process.env.BALLOT_ADDRESS
-    if (!ballotAddress || ballotAddress.length <= 0) {
-        throw new Error("Missing environment : ballot address");
-    }
-
     // create a contract instance (attach)
     const ballotContractFactory = new Ballot__factory(signer1);
     const ballotContract = ballotContractFactory.attach(ballotAddress);
 
+    console.log(`Giving rights to vote to ballot with address ${ballotAddress}`)
     for (let index = 0; index < voters.length; index++) {
-        console.log(`Giving rifht to vote to ${voters[index]}`)
+        console.log(`Giving right to vote to ${voters[index]}`)
         await ballotContract.giveRightToVote(voters[index])
     }
 }

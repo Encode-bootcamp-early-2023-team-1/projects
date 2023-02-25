@@ -4,7 +4,7 @@ import { Ballot__factory } from "../typechain-types";
 dotenv.config();
 
 // Run script as follow:
-// yarn run ts-node --files scripts/01_Deployment.ts "arg1" "arg2" "arg3"
+// yarn run ts-node --files scripts/01_Deployment.ts "Option 1" "Option 2" "Option 3"
 
 function convertStringArrayToBytes32(array: string[]) {
     const bytes32Array = [];
@@ -29,7 +29,7 @@ async function main() {
         throw new Error("Missing environment : mnemonic seed");
     }
 
-    // Get a provider
+    // get default provider from hardhat config
     const provider = ethers.provider;
 
     //Get your signer from .env ( chairperson)

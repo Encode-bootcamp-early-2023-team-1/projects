@@ -22,10 +22,28 @@ Write a report with each function execution and the transaction hash, if success
 
 In your `.env` file include connection details to Goerli network with enough test Ether to run the following scripts.
 
-# Deploy contract
-
-Once the contract is depoyed to Goerli, include the contract adddress in the `.env` file
-
-`yarn run ts-node --files scripts/01_Deployment.ts "arg1" "arg2" "arg3"`
-
 # Run scripts
+
+**IMPORANT:** make sure you select the right default network in the hardhat config.
+
+## Step 1: Deploy Ballot contract
+
+`yarn run ts-node --files scripts/01_Deployment.ts "Option 1" "Option 2" "Option 3"`
+
+**NOTE:** you will get the ballotAddress to be used in the next script.
+
+## Step 2: give rights to vote
+
+`yarn run ts-node --files scripts/02_GiveRightToVote.ts <BALLOT_ADDRESS> "voterAddress1" "voterAddress2" "voterAddressN"`
+
+**NOTE:** you need to execute this script with the same private key (PK) as the one used to deploy the contract (meaning the chairman)
+
+## Step 3: vote for a proposal
+
+`yarn run ts-node --files scripts/03_CastVote.ts <BALLOT_ADDRESS> <PROPOSAL_INDEX>`
+
+**IMPORTANT:** if you are running this script from the same machine, then you will need to change the PK in the env file to one of the voters PK. Otherwise you will be trying to vote with the chairman PK.
+
+## Step 4: Delegate vote
+
+## Step 5: Query results

@@ -3,9 +3,8 @@ import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-if (!process.env.PRIVATE_KEY || !process.env.ALCHEMY_API_KEY) {
-  console.log('Missing config params')
-  throw new Error("Missing env parameters");
+if (!process.env.PRIVATE_KEY) {
+  throw new Error("Missing private key");
 }
 
 const config: HardhatUserConfig = {
@@ -17,7 +16,7 @@ const config: HardhatUserConfig = {
       url: "http://127.0.0.1:8545"
     },
     goerli: {
-      url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY || ''}`,
       accounts: [process.env.PRIVATE_KEY]
     }
   },
