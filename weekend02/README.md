@@ -45,8 +45,11 @@ In your `.env` file include connection details to Goerli network with enough tes
 **IMPORTANT:** if you are running this script from the same machine, then you will need to change the PK in the env file to one of the voters PK. Otherwise you will be trying to vote with the chairman PK.
 
 ## Step 4: Delegate vote
-`yarn run ts-node --files scripts/03_DelegateVote.ts <BALLOT_ADDRESS> <DELEGATE_ADDRESS>`
-**IMPORTANT** The delegate must have >=1 voting weight
+
+`yarn run ts-node --files scripts/04_DelegateVote.ts <BALLOT_ADDRESS> <DELEGATE_ADDRESS>`
+
+**IMPORTANT** if you are running this script from the same machine, then you will need to change the PK in the env file to one of the voters PK. Otherwise you will be trying to vote with the chairman PK. The delegate must have >=1 voting weight
 
 ## Step 5: Query results
-`yarn run ts-node --files scripts/03_QueryResults.ts <BALLOT_ADDRESS>`
+
+`yarn run ts-node --files scripts/05_QueryResults.ts <BALLOT_ADDRESS>`
