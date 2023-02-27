@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 import { Ballot } from "../typechain-types";
 
@@ -10,6 +11,10 @@ function convertStringArrayToBytes32(array: string[]) {
         bytes32Array.push(ethers.utils.formatBytes32String(array[index]));
     }
     return bytes32Array;
+}
+
+function giveVotingRights() {
+
 }
 
 describe("Ballot", function () {
@@ -49,22 +54,30 @@ describe("Ballot", function () {
             const chairperson = await ballotContract.chairperson();
             const chairpersonVoter = await ballotContract.voters(chairperson);
             const votingWeight = chairpersonVoter.weight;
-            expect(votingWeight).to.eq(BigNumber.from("1"));      
+            expect(votingWeight).to.eq(BigNumber.from("1"));
         });
     });
 
     describe("when the chairperson interacts with the giveRightToVote function in the contract", function () {
         it("gives right to vote for another address", async function () {
-            // TODO
-            throw Error("Not implemented");
+            const signer = await ethers.getSigners();
+            const voter = signer[1].address;
+            await ballotContract.giveRightToVote(voter);
+
+            const ballotVoter = await ballotContract.voters(voter);
+            const votingWeight = ballotVoter.weight;
+            expect(votingWeight).to.eq(BigNumber.from("1"));
         });
         it("can not give right to vote for someone that has voted", async function () {
             // TODO
             throw Error("Not implemented");
         });
         it("can not give right to vote for someone that has already voting rights", async function () {
-            // TODO
-            throw Error("Not implemented");
+            const signer = await ethers.getSigners();
+            const voter = signer[1].address;
+            await ballotContract.giveRightToVote(voter);
+
+            await expect(ballotContract.giveRightToVote(voter)).to.be.reverted;
         });
     });
 
