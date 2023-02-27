@@ -13,10 +13,6 @@ function convertStringArrayToBytes32(array: string[]) {
     return bytes32Array;
 }
 
-function giveVotingRights() {
-
-}
-
 describe("Ballot", function () {
     let ballotContract: Ballot;
 
@@ -69,8 +65,17 @@ describe("Ballot", function () {
             expect(votingWeight).to.eq(BigNumber.from("1"));
         });
         it("can not give right to vote for someone that has voted", async function () {
-            // TODO
-            throw Error("Not implemented");
+            const signer = await ethers.getSigners();
+            const voter = signer[1].address;
+
+            await ballotContract.giveRightToVote(voter);
+            ballotContract.attach(voter)
+            await ballotContract.vote(0);
+
+            const chairperson = signer[0].address;
+            ballotContract.attach(chairperson);
+            await expect(ballotContract.giveRightToVote(voter)).to.be.reverted;
+
         });
         it("can not give right to vote for someone that has already voting rights", async function () {
             const signer = await ethers.getSigners();
@@ -82,9 +87,16 @@ describe("Ballot", function () {
     });
 
     describe("when the voter interact with the vote function in the contract", function () {
-        // TODO
         it("should register the vote", async () => {
-            throw Error("Not implemented");
+            const signer = await ethers.getSigners();
+            const voter = signer[1].address;
+
+            await ballotContract.giveRightToVote(voter);
+            ballotContract.attach(voter);
+            await ballotContract.vote(0);
+
+            const proposal = await ballotContract.proposals(0);
+            expect(proposal.voteCount).to.eq(BigNumber.from("1"));
         });
     });
 
