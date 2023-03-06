@@ -11,16 +11,21 @@ contract TokenizedBallot {
         uint voteCount;
     }
 
+    IMyToken public tokenContract;
+
+    Proposal[] public proposals;
+
     mapping(address => uint256) public votingPowerSpent;
     uint256 public targetBlockNumber;
-    IMyToken public tokenContract;
-    Proposal[] public proposals;
+    uint256 public numProposals;
 
     constructor(bytes32[] memory proposalNames, address _tokenContract, uint256 _targetBlockNumber) {
         tokenContract = IMyToken(_tokenContract);
         targetBlockNumber = _targetBlockNumber;
+        numProposals = 0;
         for (uint i = 0; i < proposalNames.length; i++) {
             proposals.push(Proposal({ name: proposalNames[i], voteCount: 0 }));
+            numProposals++;
         }
     }
 
