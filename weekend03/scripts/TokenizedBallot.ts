@@ -28,6 +28,8 @@ const main = async () => {
 
     await vote(contract, account2, 2, 50)
 
+    // await winner(contract)
+
     console.log(`--- TokenizedBallot Contract Test Script Finalized ---\n`)
 }
 
