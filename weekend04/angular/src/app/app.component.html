@@ -1,0 +1,138 @@
+<div class="b-body">
+
+<div class="px-4 py-5 my-5 text-center ">
+  <h3 class=" fw-bold" >Hello! <span *ngIf="signer">{{truncateEthAddress(walletAddress)}}</span> </h3>
+  <div class="top-right">
+    <div class="d-flex align-items-center">
+      <div class="mt-3 balance-btn" *ngIf="signer">
+        <!-- {{ exampleNumber | number : '1.2-2' }} -->
+    Balance: {{ userEthBalance | number : '1.2-2' }} ETH
+  </div>
+  <div class="">
+    <button type="button" class="btn btn-success mt-3 px-4 ml-5" (click)="connectToMetamask()">
+      {{ signer ? truncateEthAddress(walletAddress) : "Connect Wallet" }}
+    </button>
+  </div>
+</div>
+  </div>
+  <div class="col-lg-6 mx-auto">
+    <div class="mt-4" *ngIf="blockNumber && blockNumber > 0">
+      <p class="lead mb-4">
+        We are connected to the Goerli blockchain at the block
+        <strong>{{ blockNumber }}</strong>
+      </p>
+      <div *ngIf="transactions && transactions.length > 0">
+        <!-- <p>Transaction List : </p> -->
+        <table class="table table-striped" *ngIf="transactions && transactions.length > 0">
+          <thead>
+            <tr>
+              <th scope="col">S/N</th>
+              <th scope="col">Transaction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of transactions | slice:0:5 ; let i = index">
+              <th scope="row">{{i+1}}</th>     
+                <td class="tab-hover"> 
+                <a class="text-secondary goerli-btn" href="{{'https://goerli.etherscan.io/tx/' + transaction}}" target="_blank">{{transaction}}</a>
+                </td>  
+            </tr>
+          </tbody>
+        </table>
+
+
+      </div>
+      <!-- <div class="card mt-4 mx-auto" *ngIf="signer">
+        <div class="card-body">
+          <h5 class="card-title">User Wallet</h5>
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{ walletAddress }}
+          </h6>
+          <p class="card-text">
+            Balance: {{ userEthBalance }} ETH
+
+          </p>
+        </div>
+      </div> -->
+
+      <div class="card mt-4 mx-auto" *ngIf="signer">
+        <div class="card-body">
+          <h5 class="card-title">ERC20 Vote Token</h5>
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{ CONST_ERC20VOTE_ADDRESS }}
+          </h6>
+          <p class="card-text">
+            Token: {{ voteTokenBalance }} {{voteTokenSymbol}}
+          </p>
+          <!-- <div>
+            <label>Token to Delegate : </label>
+            <input type="number" class="form-control" placeholder="Enter a number" (change)="onVoteTokenDelegateInputChange($event)">
+          </div> -->
+          <div class="row">
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+              <label>Token to Delegate : </label> <br>
+              <input type="number" class="form-control" placeholder="Enter a number" (change)="onVoteTokenDelegateInputChange($event)">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-col px-4 gap-3 mt-4" (click)="delegateVote()">
+            Delegate Here
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+      <button type="button" class="btn btn-primary btn-lg px-4 gap-3" (click)="syncBlock()">
+        Sync
+      </button>
+      <button type="button" class="btn btn-outline-secondary btn-lg px-4" (click)="clearBlock()">
+        Clear
+      </button>
+    </div> -->
+
+    <div class="card mt-4 mx-auto" *ngIf="signer">
+      <div class="card-body">
+        <h5 class="card-title">Proposal Information</h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+          Tokenized Ballot Contract Address : {{ CONST_TOKENIZED_BALLOT_ADDRESS }}
+        </h6>
+        <p class="card-text">
+          Number of Proposal : {{ numProposal }}
+        </p>
+        <p class="card-text">
+          Current Winner : {{ winnerName }}
+        </p>
+
+        <div *ngIf="proposalNames && proposalNames.length > 0">
+          <div class="radio-group">
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let proposalName of proposalNames; let i = index">
+                <!-- Proposal {{i+1}} : {{proposalName}} -->
+                <div class="radio-option">
+                  <input type="radio" name="selectedOption" [value]="i" (change)="onOptionChange($event)">
+                  <label>{{proposalName}}</label>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+            <label>Vote Count : </label>
+            <input type="number" class="form-control" placeholder="Enter a number" (change)="onInputChange($event)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center flex-column mt-4">
+      <p>Delegate ERC20 token at ERC20Vote.sol contract first</p>
+      <div *ngIf="signer">
+        <button type="button" class="btn btn-primary btn-col px-4 gap-3" (click)="vote()">
+          Vote
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div></div>
