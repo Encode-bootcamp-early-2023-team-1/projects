@@ -1,0 +1,61 @@
+<div class="b-body">
+
+<div class="px-4 py-5 my-5 text-center ">
+  <h3 class=" fw-bold" >Hello! <span *ngIf="signer">{{truncateEthAddress(walletAddress)}}</span> </h3>
+  <div class="top-right">
+    <div class="d-flex align-items-center">
+      <div class="mt-3 balance-btn" *ngIf="signer">
+    Balance: {{ userEthBalance | number : '1.2-2' }} ETH
+  </div>
+  <div class="">
+    <button type="button" class="btn btn-success mt-3 px-4 ml-5" (click)="connectToMetamask()">
+      {{ signer ? truncateEthAddress(walletAddress) : "Connect Wallet" }}
+    </button>
+  </div>
+</div>
+  </div>
+  <div class="col-lg-6 mx-auto">
+    <div class="mt-4" *ngIf="blockNumber && blockNumber > 0">
+      <p class="lead mb-4">
+        We are connected to the Goerli blockchain at the block
+        <strong>{{ blockNumber }}</strong>
+      </p>
+    
+
+
+      <div class="card mt-4 mx-auto" *ngIf="signer">
+        <div class="card-body">
+          <h5 class="card-title"> LOTTERY TOKEN ADDRESS</h5>
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{  CONST_LOTTERY_TOKEN_ADDRESS }}
+          </h6>
+          <p class="card-text">
+            Token: {{ lotteryTokenBalance }} {{lotteryTokenSymbol}}
+          </p>
+          <p class="card-text bg-info" *ngIf="allowanceBalance == '0' else betToken">
+            allowance: {{ allowanceBalance  }}
+            <button (click)="approveTokens()">Approve</button>
+          </p>
+
+          <ng-template #betToken>
+            <button type="button" class="btn btn-primary px-3" (click)="bet()">Bet </button>
+
+          </ng-template>
+
+          <div class="row">
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+              <input type="number" class="form-control" placeholder="Enter amount in ETH" (change)="onTokenBuyInputChange($event)">
+            </div>
+
+            <button type="button" class="btn btn-primary mt-4" (click)="buyTokens()" >
+              Buy Token
+            </button>
+           
+          </div>
+
+        
+
+        </div>
+      </div>
+    </div> 
+</div>
