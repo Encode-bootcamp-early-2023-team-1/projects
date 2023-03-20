@@ -8,34 +8,10 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 ## Screenshots
 
-![Screenshot](./screenshot/MainPage.jpg)
-### Main Page Screenshot. User can connect wallet using metamask in the upper right corner
+![Screenshot](./screenshot/lotery.jpg.jpg)
+### Main Page Screenshot. User connected to metamask wallet will see this display. User able to buy token and bet accordingly. User can also view how much token won.
 <br />
 
-![Screenshot](./screenshot/TransactionList.jpg)
-### List of transactions in the block with Goerli blockchain
-<br />
-<br />
-
-![Screenshot](./screenshot/TokenBalance.jpg)
-### Can see user eth balance and erc20 vote token balance
-<br />
-<br />
-
-![Screenshot](./screenshot/DelegateToken.jpg)
-### User can delegate vote tokens to this tokenzied ballot contract
-<br />
-<br />
-
-![Screenshot](./screenshot/ProposalVote.jpg)
-### Proposal vote page where user can choose proposal and enter vote count
-<br />
-<br />
-
-![Screenshot](./screenshot/VotingError.jpg)
-### When voting power is not enough , will hit this error. Metamask will return error
-<br />
-<br />
 
 ## Command Used
 

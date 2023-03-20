@@ -21,35 +21,46 @@ export class AppComponent {
   userEthBalance: string | undefined;
   walletAddress: string | undefined;
   signer: Signer | undefined;
-  ballotContract : Contract | undefined;
-  numProposal : BigNumber | undefined;
-  proposalNames : string [] = [];
-  proposalCounts : BigNumber [] = [];
-  winnerName : string | undefined;
+  ballotContract: Contract | undefined;
+  numProposal: BigNumber | undefined;
+  proposalNames: string[] = [];
+  proposalCounts: BigNumber[] = [];
+  winnerName: string | undefined;
   // Used in voting tokenized ballot
   selectedOption: string | undefined;
   voteNumber: number = 0;
-  erc20VoteContract : Contract | undefined;
+  erc20VoteContract: Contract | undefined;
   // Used in delegate
-  voteTokenSymbol : string | undefined;
-  voteTokenBalance : BigNumber | undefined;
+  voteTokenSymbol: string | undefined;
+  voteTokenBalance: BigNumber | undefined;
   voteTokenDelegate: number = 0;
 
-  lotteryTokenSymbol : string | undefined;
-  lotteryTokenBalance : BigNumber | undefined;
-  allowanceBalance : string = '0';
-  
+  lotteryTokenSymbol: string | undefined;
+  lotteryTokenBalance: BigNumber | undefined;
+  allowanceBalance: string = '0';
+  lotteryPrizePool: BigNumber | undefined;
+
+  betManyCount : number = 0;
+  winAmount : number = 0;
+
 
   CONST_GOERLIETH_ADDRESS: string = "0x7af963cf6d228e564e2a0aa0ddbf06210b38615d";
   CONST_ERC20VOTE_ADDRESS: string = "0x19cA7135FD75552ACEa1027065DC10AB41b38B34";
   CONST_TOKENIZED_BALLOT_ADDRESS: string = "0x33048359595Def305206558a9a156cc1d97A1C10";
   CONST_LOCALHOST_VOTE: string = "";
 
-  CONST_LOTTERY_ADDRESS = "0xEDfbA0705478680B0A973c6F2aD17B5feF1853d7";
-  CONST_LOTTERY_TOKEN_ADDRESS = "0x2ab0735F9112299c8279D3aB976335ec77987BB8";
 
-  constructor (private http: HttpClient){
-    
+  // Weekend 5
+  // Goerli
+  //CONST_LOTTERY_ADDRESS = "0xEDfbA0705478680B0A973c6F2aD17B5feF1853d7";
+  //CONST_LOTTERY_TOKEN_ADDRESS = "0x2ab0735F9112299c8279D3aB976335ec77987BB8";
+
+  // Mumbai polygon address
+  CONST_LOTTERY_ADDRESS = "0x59F566B70065B4FC56F7425730beb661B57f18b7";
+  CONST_LOTTERY_TOKEN_ADDRESS = "0x28f5EDc1663C65fb02c3e3Fbc3773778E2dc4C51";
+
+  constructor(private http: HttpClient) {
+
   }
 
   syncBlock() {
@@ -71,17 +82,17 @@ export class AppComponent {
   }
 
   onVoteTokenDelegateInputChange(event: any) {
-    this.voteTokenDelegate = event.target.value;
-    console.log(`The input value is: ${this.voteTokenDelegate}`);
+    this.betManyCount = event.target.value;
+    console.log(`The input value is: ${this.betManyCount}`);
   }
 
   getTokenAddess() {
-    return this.http.get<{address: string}>(this.CONST_LOCALHOST_VOTE);
+    return this.http.get<{ address: string }>(this.CONST_LOCALHOST_VOTE);
   }
 
   // example ussage of http pub sub
-  tokenContractAddress : string | undefined;
-  httpvote () {
+  tokenContractAddress: string | undefined;
+  httpvote() {
     this.getTokenAddess().subscribe((response) => {
       this.tokenContractAddress = response.address;
     })
@@ -93,15 +104,15 @@ export class AppComponent {
 
   async getVoteTokenSymbol() {
     if (this.erc20VoteContract !== undefined) {
-        this.voteTokenSymbol = await this.erc20VoteContract['symbol']();
+      this.voteTokenSymbol = await this.erc20VoteContract['symbol']();
     }
   }
 
   async getVoteTokenBalance() {
     if (this.erc20VoteContract !== undefined) {
-      console.log("wallet: " + this.walletAddress );
+      console.log("wallet: " + this.walletAddress);
       const balance = await this.erc20VoteContract['balanceOf'](ethers.utils.getAddress(this.walletAddress ?? ""));
-      this.voteTokenBalance = balance; 
+      this.voteTokenBalance = balance;
     }
   }
 
@@ -120,8 +131,8 @@ export class AppComponent {
       });
     }
   }
-  
-  
+
+
   async getWinnerName() {
     if (this.ballotContract !== undefined) {
       const name = await this.ballotContract['winnerName']();
@@ -139,26 +150,26 @@ export class AppComponent {
   async vote() {
     const ballotVoteContract = new ethers.Contract(this.CONST_TOKENIZED_BALLOT_ADDRESS, tokenizedBallotJson, this.signer);
     if (ballotVoteContract !== undefined) {
-      ballotVoteContract['vote'](BigNumber.from(this.selectedOption),BigNumber.from(this.voteNumber)).then((tx: any) => {
+      ballotVoteContract['vote'](BigNumber.from(this.selectedOption), BigNumber.from(this.voteNumber)).then((tx: any) => {
         // Transaction successful
         console.log(tx);
       }).catch((error: { message: any; }) => {
         // Transaction failed
         alert(error.message);
       });
-      
+
     }
   }
 
-  async getContract () {
+  async getContract() {
     this.ballotContract = new ethers.Contract(this.CONST_TOKENIZED_BALLOT_ADDRESS, tokenizedBallotJson, this.provider);
   }
 
-  async getVoteContract () {
+  async getVoteContract() {
     this.erc20VoteContract = new ethers.Contract(this.CONST_ERC20VOTE_ADDRESS, erc20voteJson, this.provider);
   }
 
-  async getProposalName () {
+  async getProposalName() {
     if (this.ballotContract !== undefined) {
       if (this.numProposal !== undefined) {
         for (let i = BigNumber.from(0); i.lt(this.numProposal); i = i.add(BigNumber.from(1))) {
@@ -187,6 +198,7 @@ export class AppComponent {
         this.setLotteryContract();
         this.setTokenContract();
         this.getAllowance();
+        this.getPrizePool();
 
       }).catch(error => {
         console.error(error);
@@ -200,7 +212,7 @@ export class AppComponent {
       })
 
       console.log("goerli address: " + this.CONST_GOERLIETH_ADDRESS);
-      
+
       // in sequence 
       await this.syncBlock();
       await this.getContract();
@@ -210,44 +222,50 @@ export class AppComponent {
       await this.getProposalCount();
       await this.getProposalName();
       await this.getWinnerName();
+      
     } else {
       console.error('Metamask not detected');
     }
   }
 
   // Captures 0x + 4 characters, then the last 4 characters.
- truncateRegex = /^(0x[a-zA-Z0-9]{4})[a-zA-Z0-9]+([a-zA-Z0-9]{4})$/;
+  truncateRegex = /^(0x[a-zA-Z0-9]{4})[a-zA-Z0-9]+([a-zA-Z0-9]{4})$/;
 
-/**
- * Truncates an ethereum address to the format 0x0000…0000
- * @param address Full address to truncate
- * @returns Truncated address
- */
- truncateEthAddress = (address ="0x") => {
-  const match = address.match(this.truncateRegex);
-  if (!match) return address;
-  return `${match[1]}…${match[2]}`;
-};
-
-
+  /**
+   * Truncates an ethereum address to the format 0x0000…0000
+   * @param address Full address to truncate
+   * @returns Truncated address
+   */
+  truncateEthAddress = (address = "0x") => {
+    const match = address.match(this.truncateRegex);
+    if (!match) return address;
+    return `${match[1]}…${match[2]}`;
+  };
 
 
+  async getPrizePool() {
+    try {
+      let prizepool = await this.lotteryContract!["prizePool"]();
+      this.lotteryPrizePool = prizepool;
+    } catch (error) {
+      console.log(error);
+    }
 
-
-
-// lottery codes
-async getUserTokenBalance() {
-  const lotteryTokenContract = new ethers.Contract(this.CONST_LOTTERY_TOKEN_ADDRESS, lotteryTokenAbi, this.signer);
-  if (!lotteryTokenContract) return
-  try {
-    const balance = await lotteryTokenContract["balanceOf"](this.walletAddress)
-    this.lotteryTokenBalance = balance.toString()
-  } catch (error : any) {
-    alert(error.message);
-      console.log(error.message);
   }
-  // {
-    
+
+  // lottery codes
+  async getUserTokenBalance() {
+    const lotteryTokenContract = new ethers.Contract(this.CONST_LOTTERY_TOKEN_ADDRESS, lotteryTokenAbi, this.signer);
+    if (!lotteryTokenContract) return
+    try {
+      const balance = await lotteryTokenContract["balanceOf"](this.walletAddress)
+      this.lotteryTokenBalance = balance.toString()
+    } catch (error: any) {
+      alert(error.message);
+      console.log(error.message);
+    }
+    // {
+
     // erc20VoteSignContract['delegate'](ethers.utils.getAddress(this.walletAddress ?? "")).then((tx: any) => {
     //   // Transaction successful
     //   console.log(tx);
@@ -257,69 +275,90 @@ async getUserTokenBalance() {
     //   alert(error.message);
     //   console.log(error.message);
     // });
-  // }
-}
-lotteryContract : Contract | undefined;
-tokenContract : Contract | undefined;
-async buyTokens() {
-  // contractInstance.testFunction(<any function args>, { value: ethers.utils.parseUnits("1", "ether") });
- try {
-  // how to send ether to function
-  // https://stackoverflow.com/questions/71422360/how-to-send-eth-to-a-contract-function-with-ethers-js
-  await this.lotteryContract!['purchaseTokens']({ value: ethers.utils.parseUnits(this.tokenBuyInput as string, "ether") })
- } catch (error) {
-  console.log(error)
- }
- 
-}
-
-tokenBuyInput : string | undefined;
-async onTokenBuyInputChange(e:any){
-this.tokenBuyInput = e.target.value;
-}
-async setLotteryContract(){
-  const lotteryContract = new ethers.Contract(this.CONST_LOTTERY_ADDRESS, lotteryAbi, this.signer);
-  this.lotteryContract = lotteryContract;
-}
-async setTokenContract(){
-  const getLotteryToken = new ethers.Contract(this.CONST_LOTTERY_TOKEN_ADDRESS, lotteryTokenAbi, this.signer);
-  this.tokenContract = getLotteryToken;
-}
-
-async getAllowance(){
-  try {
-  let checkAllowance = await this.tokenContract!["allowance"]( this.walletAddress, this.CONST_LOTTERY_ADDRESS);
-  this.allowanceBalance = checkAllowance.toString();
-  } catch (error) {
-    console.error(error);
+    // }
   }
-}
-async approveTokens(){
-  try {
-    let approveContract = await this.tokenContract!["approve"](this.CONST_LOTTERY_ADDRESS, ethers.utils.parseUnits( (1*10**18).toString(), "ether"));
-    alert("transaction sent successfully")
- await approveContract.wait();
- alert("transaction confirmed")
-this.getAllowance()
-  } catch (error) {  
+  lotteryContract: Contract | undefined;
+  tokenContract: Contract | undefined;
+  async buyTokens() {
+    // contractInstance.testFunction(<any function args>, { value: ethers.utils.parseUnits("1", "ether") });
+    try {
+      // how to send ether to function
+      // https://stackoverflow.com/questions/71422360/how-to-send-eth-to-a-contract-function-with-ethers-js
+      await this.lotteryContract!['purchaseTokens']({ value: ethers.utils.parseUnits(this.tokenBuyInput as string, "ether") })
+    } catch (error) {
+      console.log(error)
+    }
+
   }
-}
 
-async bet(){
-try {
- let betting = await this.lotteryContract!["bet"]()
- alert("transaction sent successfully")
-  await betting.wait();
- alert("transaction confirmed")
-} catch (error) {
-  
-}
-}
+  tokenBuyInput: string | undefined;
+  async onTokenBuyInputChange(e: any) {
+    this.tokenBuyInput = e.target.value;
+  }
+  async setLotteryContract() {
+    const lotteryContract = new ethers.Contract(this.CONST_LOTTERY_ADDRESS, lotteryAbi, this.signer);
+    this.lotteryContract = lotteryContract;
+  }
+  async setTokenContract() {
+    const getLotteryToken = new ethers.Contract(this.CONST_LOTTERY_TOKEN_ADDRESS, lotteryTokenAbi, this.signer);
+    this.tokenContract = getLotteryToken;
+  }
 
-// let checkAllowance = await contract.allowance(address1,address2)
+  async getAllowance() {
+    try {
+      let checkAllowance = await this.tokenContract!["allowance"](this.walletAddress, this.CONST_LOTTERY_ADDRESS);
+      this.allowanceBalance = checkAllowance.toString();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async approveTokens() {
+    try {
+      let approveContract = await this.tokenContract!["approve"](this.CONST_LOTTERY_ADDRESS, ethers.utils.parseUnits((1 * 10 ** 18).toString(), "ether"));
+      alert("transaction sent successfully")
+      await approveContract.wait();
+      alert("transaction confirmed")
+      this.getAllowance()
+    } catch (error) {
+    }
+  }
 
-// let formattedAllowance = checkAllowance.toString();
-// await console.log(formattedAllowance);
+  async bet() {
+    try {
+      let betting = await this.lotteryContract!["bet"]()
+      alert("transaction sent successfully")
+      await betting.wait();
+      alert("transaction confirmed")
+    } catch (error) {
+
+    }
+  }
+
+  async betMany() {
+    try {
+      let betting = await this.lotteryContract!["betMany"](BigNumber.from(this.betManyCount))
+      alert("transaction sent successfully")
+      await betting.wait();
+      alert("transaction confirmed")
+    } catch (error) {
+
+    }
+  }
+
+  async showWinAmount() {
+    try {
+      let betting = await this.lotteryContract!["prize"](ethers.utils.getAddress(this.walletAddress ?? ""))
+      await betting.wait();
+      this.winAmount = betting;
+    } catch (error) {
+
+    }
+  }
+
+  // let checkAllowance = await contract.allowance(address1,address2)
+
+  // let formattedAllowance = checkAllowance.toString();
+  // await console.log(formattedAllowance);
 
 }
 
