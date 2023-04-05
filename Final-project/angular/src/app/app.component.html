@@ -1,0 +1,106 @@
+<div class="b-body">
+
+  <div class="px-4 py-5 my-5 ">
+    <div class="text-center">
+    <h3 class=" fw-bold">Hello! <span *ngIf="signer">{{truncateEthAddress(walletAddress)}}</span> </h3>
+    <div class="top-right">
+      <div class="d-flex align-items-center">
+        <div class="mt-3 balance-btn" *ngIf="signer">
+          Balance: {{ userEthBalance | number : '1.2-2' }} ETH
+        </div>
+        <div class="">
+          <button type="button" class="btn btn-success mt-3 px-4 ml-5" (click)="connectToMetamask()">
+            {{ signer ? truncateEthAddress(walletAddress) : "Connect Wallet" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div class="col-lg-6 mx-auto">
+      <div class="mt-4" *ngIf="blockNumber && blockNumber > 0">
+        <p class="lead mb-4">
+          We are connected to the Goerli blockchain at the block
+          <strong>{{ blockNumber }}</strong>
+        </p>
+
+
+
+        <!-- <div class="card mt-4 mx-auto" *ngIf="signer">
+          <div class="card-body">
+            <h5 class="card-title"> LOTTERY TOKEN ADDRESS</h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+              {{ CONST_LOTTERY_TOKEN_ADDRESS }}
+            </h6>
+            <p class="card-text">
+              Lottery Prize Pool: {{ lotteryPrizePool }} {{lotteryTokenSymbol}}
+            </p>
+            <p class="card-text">
+              Token Available: {{ lotteryTokenBalance }} {{lotteryTokenSymbol}}
+            </p>
+            <p class="card-text bg-info" *ngIf="allowanceBalance == '0' else betToken">
+              allowance: {{ allowanceBalance }}
+              <button (click)="approveTokens()">Approve</button>
+            </p>
+
+            <ng-template #betToken>
+              <div class="row">
+                <div class="col mb-4">
+                  <button type="button" class="btn btn-primary px-3" (click)="bet()">Bet </button>
+                </div>
+                <div class="col mb-4">
+                  <button type="button" class="btn btn-danger px-3" (click)="showWinAmount()"> Win Amount </button>
+                  {{winAmount}} MATIC
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col mb-8">
+                  <button type="button" class="btn btn-primary px-3" (click)="betMany()">Bet Many </button>
+                </div>
+                <div class="col mb-8">
+                  <input type="number" class="form-control" placeholder="Bet number"
+                    (change)="onVoteTokenDelegateInputChange($event)">
+                </div>
+              </div>
+
+            </ng-template>
+
+            <div class="card mt-4 mx-auto" *ngIf="signer">
+              <div class="card-body">
+                <h5 class="card-title"> Buy Lottery Token</h5>
+                <input type="number" class="form-control" placeholder="Enter amount in ETH"
+                  (change)="onTokenBuyInputChange($event)">
+                  <button type="button" class="btn btn-primary mt-4" (click)="buyTokens()">
+                    Buy Token
+                  </button>
+              </div>
+            </div>
+
+
+          </div>
+        </div> -->
+      <div class="">
+        <form>
+  <div class="form-group">
+    <div class="mb-3">
+    <label class="text-left">Amount</label>
+    <input type="number" name="lockAmount" class="form-control " id="exampleInput" aria-describedby="emailHelp" placeholder="Enter amount you want to save" (change)="handleChange($event)">
+  </div>
+    <div class="mb-3">
+    <label class="text-left">Date</label>
+    <input type="date" name="unlockPeriod" class="form-control" (change)="handleChange($event)">
+  </div>
+</div>
+<div class="" >
+  <button type="submit" class="btn btn-primary mt-3" (click)="lockToken()">
+    {{loading ? "loading" : "Submit" }}
+  </button>
+  <div class="" *ngIf="success">
+    <p>You have successfully locked {{lockAmount}}</p>
+  </div>
+</div>
+</form>
+      </div>
+      
+      </div>
+    </div>
