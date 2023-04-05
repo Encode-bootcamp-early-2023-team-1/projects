@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ethers, Wallet, utils, Signer, BigNumber, BigNumberish, Contract } from 'ethers';
 import erc20voteJson from './erc20-abi.json'
+import lockAbi from './lock-abi.json'
 import tokenizedBallotJson from './tokenizedballot-abi.json'
 import lotteryAbi from './lottery-abi.json';
 import lotteryTokenAbi from './lottery-token-abi.json';
@@ -43,6 +44,12 @@ export class AppComponent {
   betManyCount : number = 0;
   winAmount : number = 0;
 
+  // lock variable
+ availableToken :  string | undefined;
+ lockAmount : string | undefined;
+ unlockPeriod : string | undefined
+ lockTokenContract : Contract | undefined;
+
 
   CONST_GOERLIETH_ADDRESS: string = "0x7af963cf6d228e564e2a0aa0ddbf06210b38615d";
   CONST_ERC20VOTE_ADDRESS: string = "0x19cA7135FD75552ACEa1027065DC10AB41b38B34";
@@ -58,6 +65,10 @@ export class AppComponent {
   // Mumbai polygon address
   // CONST_LOTTERY_ADDRESS = "0x59F566B70065B4FC56F7425730beb661B57f18b7";
   // CONST_LOTTERY_TOKEN_ADDRESS = "0x28f5EDc1663C65fb02c3e3Fbc3773778E2dc4C51";
+
+  // final project
+
+  CONST_LOCK_TOKEN = "0x2ab0735F9112299c8279D3aB976335ec77987BB8";
 
   constructor(private http: HttpClient) {
 
@@ -199,6 +210,8 @@ export class AppComponent {
         this.setTokenContract();
         this.getAllowance();
         this.getPrizePool();
+        this.getLockTokenContract();
+        this.getAvailableAmount();
 
       }).catch(error => {
         console.error(error);
@@ -355,10 +368,55 @@ export class AppComponent {
     }
   }
 
-  // let checkAllowance = await contract.allowance(address1,address2)
 
-  // let formattedAllowance = checkAllowance.toString();
-  // await console.log(formattedAllowance);
+  // lock token Code
 
+  async getLockTokenContract(){
+    const lockTokenContract = new ethers.Contract(this.CONST_LOCK_TOKEN, lockAbi, this.signer);
+    this.lockTokenContract = lockTokenContract;
+  }
+
+  async getAvailableAmount(){
+    const availableAmount = await this.lockTokenContract!["getUnlockedAmount"](this.walletAddress);
+    this.availableToken  = availableAmount.toString() ?? '0';
 }
 
+async handleChange(e: Event) {
+  const input = e.target as HTMLInputElement;
+  const name = input.name;
+  let value = input.value;
+
+  // Use a type assertion to ensure that `this` has an index signature
+  if (name === 'unlockPeriod') {
+    const currentDate = new Date();
+    const targetDate = new Date(value);
+    const diffInSeconds = (targetDate.getTime() - currentDate.getTime()) / 1000;
+    const newBlockToAdd = Math.ceil(diffInSeconds / 12) + Number(this.blockNumber) as number;
+    value = newBlockToAdd.toString()
+    // console.log(diffInSeconds, newBlockToAdd, value);
+  }
+  (this as any)[name] = value;
+}
+
+loading = false;
+error = false;
+success = false;
+pending = false
+
+async lockToken (){
+  this.loading = true;
+  this.error = false;
+  try {
+    const userLockToken = await this.lockTokenContract!["lock"](this.lockAmount, this.unlockPeriod);
+    this.pending= true;
+    const response = await userLockToken.wait();
+    this.pending = false;
+  } catch (error) {
+    this.error = true;
+  } finally {
+    this.loading = false
+  }
+  
+}
+
+}
