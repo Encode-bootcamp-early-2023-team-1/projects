@@ -1,21 +1,11 @@
 <a name="readme-top"></a>
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Issues][issues-shield]][issues-url]
-[![GPL-3.0 License][license-shield]][license-url]
-
 <!-- PROJECT LOGO -->
 <br />
-<div align="center">
-  <a href="https://github.com/uri1001/the-hardhat-project">
-    <img src="assets/logo.png" alt="Logo" width="80" height="80">
-  </a>
-
-<h3 align="center">Hardhat Environment Template</h3>
+<h3 align="center">Final Project Contracts</h3>
 
   <p align="center">
-    Hardhat Environment Template with an Advanced Basic Setup
+    An Implementation of an ERC20 Token Locker and DEX 
     <br />
     <br />
     <a href="https://github.com/uri1001/the-hardhat-project"><strong>Explore the docs »</strong></a>
@@ -357,7 +347,7 @@ Ethereum Testnets Faucet Status: [FaucetLink](https://faucetlink.to/)
 
 ## 5. Contact
 
-Oriol Rodríguez Setó - uri1001@pm.me
+uri1001@pm.me
 
 Project Link: [https://github.com/uri1001/the-hardhat-project](https://github.com/uri1001/the-hardhat-project)
 
