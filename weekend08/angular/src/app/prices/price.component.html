@@ -1,0 +1,16 @@
+<div class="container">
+  <h1 class="heading">Top 100 Cryptocurrencies</h1>
+  <select class="select" (change)="handleCryptoSelect($event)">
+    <option value="">Select a cryptocurrency</option>
+    <option *ngFor="let crypto of cryptos" [value]="crypto.id">{{ crypto.name }}</option>
+  </select>
+  <div *ngIf="selectedCrypto" class="crypto-card">
+    <h2 class="crypto-name">
+      {{ selectedCrypto.symbol }} <!-- Display currency symbol -->
+      {{ selectedCrypto.name }}
+    </h2>
+    <p class="crypto-symbol">Symbol: {{ selectedCrypto.symbol }}</p>
+    <p class="crypto-price">Price: {{ selectedCrypto.current_price | currency: 'USD' }}</p>
+    <!-- Display other relevant information about the selected cryptocurrency -->
+  </div>
+</div>
