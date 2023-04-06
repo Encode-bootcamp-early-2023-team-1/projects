@@ -67,6 +67,26 @@ describe('ERC20Lock', () => {
                     Number(await contract.connect(account1).getUnlockedAmount(account1.address)),
                 ).to.be.equal(100)
             })
+
+            it('Should maintain the same total balance after locking tokens', async () => {
+                const { contract, deployer } = await loadFixture(deployAndMintFixture);
+    
+                const currentBlockNumber = await ethers.provider.getBlockNumber();
+                const unlockBlockNumber = currentBlockNumber + 100;
+                const lockAmount = 10;
+    
+                const initialLockedBalance = await contract.connect(deployer).getLockedAmount(deployer.address);
+                const initialUnlockedBalance = await contract.connect(deployer).getUnlockedAmount(deployer.address);
+                const initialTotalBalance = initialLockedBalance.add(initialUnlockedBalance);
+    
+                await contract.connect(deployer).lockAmount(lockAmount, unlockBlockNumber);
+    
+                const finalLockedBalance = await contract.connect(deployer).getLockedAmount(deployer.address);
+                const finalUnlockedBalance = await contract.connect(deployer).getUnlockedAmount(deployer.address);
+                const finalTotalBalance = finalLockedBalance.add(finalUnlockedBalance);
+    
+                expect(finalTotalBalance).to.equal(initialTotalBalance);
+            });
         })
 
         describe('Lock Balances Check With Block Mining', () => {
@@ -122,5 +142,91 @@ describe('ERC20Lock', () => {
                 ).to.be.equal(100)
             })
         })
+
+    describe('Lock Function Validation', () => {
+        it('should revert when unlock block number is less than or equal to current block number', async () =>{
+            const {contract, deployer} = await loadFixture(deployAndMintFixture);
+
+            const currentBlockNumber = await ethers.provider.getBlockNumber();
+             expect(contract.connect(deployer).lockAmount(10, currentBlockNumber)).to.be.revertedWith("Invalid Unlock Block Number")
+             expect(contract.connect(deployer).lockAmount(10, currentBlockNumber - 1)).to.be.revertedWith("Invalid Unlock Block Number") 
+        })
+
+        it("should and allow the user to lock the desired amount if the unlock block number is greater than current block number",async ()=>{
+            const {contract, deployer} = await loadFixture(deployAndMintFixture);
+            const fundsBeforeCall = await contract.getLocksLength(deployer.address);
+            const currentBlockNumber = await ethers.provider.getBlockNumber();
+            const unlockBlockNumber = currentBlockNumber + 100
+            await contract.connect(deployer).lockAmount(10, unlockBlockNumber);
+            const fundsAfterCall = await contract.getLocksLength(deployer.address);
+            expect(fundsAfterCall).to.be.gt(fundsBeforeCall);
+
+        })
+
+        it("should emit AmountLocked event when lockAmount is called with valid parameters", async ()=>{
+            const {contract, deployer} = await loadFixture(deployAndMintFixture);
+
+            const currentBlockNumber = await ethers.provider.getBlockNumber();
+            const unlockBlockNumber = currentBlockNumber + 100;
+            await expect(contract.connect(deployer).lockAmount(10, unlockBlockNumber))
+            .to.emit(contract, 'AmountLocked')
+            .withArgs(deployer.address, 10, unlockBlockNumber)
+            
+        })
+
+        it('should revert when the user does not have enough unlocked balance to lock', async () => {
+            const { contract, deployer } = await loadFixture(deployAndMintFixture);
+
+            const currentBlockNumber = await ethers.provider.getBlockNumber();
+            const unlockBlockNumber = currentBlockNumber + 100;
+            const lockedAmount = await contract.connect(deployer).getUnlockedAmount(deployer.address) + 1;
+
+            await expect(
+                contract.connect(deployer).lockAmount(lockedAmount, unlockBlockNumber)
+            ).to.be.revertedWith("Not Enough Unlocked Balance");
+        });
+
+        it('should subtract the locked amount from the unlocked balance', async () => {
+            const { contract, deployer } = await loadFixture(deployAndMintFixture);
+
+            const currentBlockNumber = await ethers.provider.getBlockNumber();
+            const unlockBlockNumber = currentBlockNumber + 100;
+            const lockAmount = 10;
+
+            const initialUnlockedBalance = await contract.connect(deployer).getUnlockedAmount(deployer.address);
+
+            await contract.connect(deployer).lockAmount(lockAmount, unlockBlockNumber);
+
+            const finalUnlockedBalance = await contract.connect(deployer).getUnlockedAmount(deployer.address);
+
+            expect(finalUnlockedBalance).to.equal(initialUnlockedBalance - lockAmount);
+        });
+
+        it('Should not allow locking tokens when the unlocked balance is insufficient', async () => {
+            const { contract, deployer } = await loadFixture(deployAndMintFixture)
+        
+            await contract.connect(deployer).lockAmount(90, 100)
+            await expect(contract.connect(deployer).lockAmount(20, 110)).to.be.revertedWith("Not Enough Unlocked Balance")
+        })
+    })
+
+    describe("Minting", async () =>{
+        it('Should allow the owner to mint tokens and update the recipient balance correctly', async () => {
+            const { contract, deployer, account1 } = await loadFixture(deployAndMintFixture)
+        
+            await contract.connect(deployer).mint(account1.address, 50)
+            expect(Number(await contract.balanceOf(account1.address))).to.be.equal(150)
+        })
+    })
+
+    describe("Pausing", async () =>{
+        it('Should not allow transfers when the contract is paused', async () => {
+            const { contract, deployer, account1 } = await loadFixture(deployAndMintFixture)
+        
+            await contract.connect(deployer).pause()
+            await expect(contract.connect(deployer).transfer(account1.address, 10)).to.be.revertedWith("Pausable: paused")
+        })
+    })
     })
 })
+
