@@ -1,0 +1,36 @@
+<div class="b-body">
+    <div class="px-4 py-5 my-5 text-center ">
+        <h3 class="fw-bold">Top Coins in Wallet
+        </h3>
+        <div class="mt-4 mx-auto col-md-12">
+
+            <table class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>Token</th>
+                    <th>Unit</th>
+                    <th>Price In USD</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Ethereum</td>
+                    <td>{{userEthBalance}}</td>
+                    <td>$ {{ethPrice}}</td>
+                    <td>$ {{userEthBalance* ethPrice}}</td>
+                  </tr>
+                  <tr>
+                    <td>Uniswap</td>
+                    <td>{{userUniswapBalance}}</td>
+                    <td>$ {{uniswapPrice}}</td>
+                    <td>$ {{userUniswapBalance * uniswapPrice}}</td>
+                  </tr>
+                  <!-- more rows can be added here -->
+                </tbody>
+              </table>
+            
+        </div>
+
+    </div>
+</div>

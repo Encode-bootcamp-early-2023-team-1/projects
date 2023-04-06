@@ -1,0 +1,40 @@
+.top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+}
+
+.radio-option input[type="radio"] {
+  margin-right: 10px;
+}
+
+.goerli-btn{
+  text-decoration: none;
+}
+.tab-hover:hover{
+  background: rgb(207, 204, 204);
+}
+
+.balance-btn{
+  margin-right: 0.7rem;
+}
+
+.btn-col:hover{
+background: transparent;
+color: rgb(32, 32, 32);
+}
+
+.b-body{
+  background:rgb(253, 253, 253);
+}

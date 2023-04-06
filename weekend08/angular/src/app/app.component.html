@@ -1,0 +1,29 @@
+
+<head>
+  <meta charset="UTF-8">
+  <!-- Link to Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<!-- Link to Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a routerLink="/home" class="nav-item nav-link active" href="#">Home</a>
+      <a routerLink="/lock" class="nav-item nav-link" href="#">Lock</a>
+      <a routerLink="/balances" class="nav-item nav-link" href="#">Balances</a>
+      <a class="nav-item nav-link" href="#">Swap Token</a>
+    </div>
+  </div>
+
+  <form class="form-inline mr-5">
+    <button type="button" class="btn btn-success my-2 my-sm-0 px-5 mx-3" (click)="connectToMetamask()">
+      {{ signer ? truncateEthAddress(walletAddress) : "Connect Wallet" }}
+    </button>
+  </form>
+
+</nav>
+
+<router-outlet></router-outlet>
